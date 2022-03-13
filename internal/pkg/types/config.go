@@ -11,6 +11,7 @@ type Config struct {
 	AirtableBaseID             string `required:"true" split_words:"true"`
 	AirtableOrganizationsTable string `required:"true" split_words:"true"`
 	AirtableAdminsTable        string `required:"true" split_words:"true"`
+	AirtableCategoriesTable    string `required:"true" split_words:"true"`
 
 	HttpPort uint `required:"true" split_words:"true" default:"8080"`
 }

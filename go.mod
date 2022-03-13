@@ -3,6 +3,7 @@ module github.com/ngo-coordination-warsaw/ngo-api
 go 1.16
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fabioberger/airtable-go v3.1.0+incompatible
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.7.2
