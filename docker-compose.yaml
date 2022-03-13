@@ -1,0 +1,40 @@
+version: '3.1'
+services:
+  postgres:
+    container_name: ngo-postgres
+    image: postgres:11
+    networks:
+      - ngo
+    ports:
+      - 5432:5432
+    restart: always
+    environment:
+      POSTGRES_USER: "${PG_USER}"
+      POSTGRES_PASSWORD: "${PG_PASS}"
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
+  ngo:
+    ports:
+      - 8080:8080
+    image: ngo:local
+    container_name: ngo-ngo
+    restart: always
+    depends_on:
+      - postgres
+    networks:
+      - ngo
+    environment:
+      PG_HOST: "postgres"
+      PG_USER: "${PG_USER}"
+      PG_PASS: "${PG_PASS}"
+      PG_DB: "${PG_DB}"
+      PG_MIGRATIONS_PATH: "/app/migrations"
+      TG_BOT_TOKEN: "${TG_BOT_TOKEN}"
+      AUTH_KEY: "${AUTH_KEY}"
+
+networks:
+  ngo:
+
+volumes:
+  postgres:

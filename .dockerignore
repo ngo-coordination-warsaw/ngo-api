@@ -1,0 +1,9 @@
+.vscode/
+.idea
+.env
+
+# Intellij
+.idea/
+*.iml
+*.iws
+.ngo
