@@ -1,9 +1,9 @@
 package ngo
 
 import (
-	"time"
-
+	"github.com/gosimple/slug"
 	"github.com/sirupsen/logrus"
+	"time"
 )
 
 type airtableData struct {
@@ -56,7 +56,9 @@ func (ngo *ngo) loadData() error {
 
 	organizationsData := make(map[string][]org)
 	for _, o := range orgs {
-		for _, c := range o.Fields.Category {
+		for _, c := range o.Fields.CategoryName {
+			c := slug.Make(c)
+
 			if _, ok := organizationsData[c]; !ok {
 				organizationsData[c] = []org{}
 			}
@@ -94,10 +96,18 @@ func (ngo *ngo) loadCategories() error {
 
 	cat := []interface{}{}
 	for _, i := range data {
+		categoryName := i.Fields["Name"].(string)
+		s := slug.Make(categoryName)
+		if s == "" {
+			logrus.Errorf("Cannot make slug: %s", categoryName)
+			continue
+		}
+
 		cat = append(cat, map[string]interface{}{
-			"ID":     i.ID,
 			"Name":   i.Fields["Name"],
 			"NameUA": i.Fields["NameUA"],
+			"Icon":   i.Fields["Icon"],
+			"Slug":   s,
 		})
 	}
 
