@@ -85,13 +85,20 @@ def create_organization(organization: Organization):
     return created_airtable_record
 
 
-def verify_organization_id(organization_id: str):
+@app.get("/organization/{organization_id}")
+def read_organization(organization_id: str):
+    # TODO restrict access?
+    airtable_record = organizations_table.get(organization_id)
+    return airtable_record
+
+
+def verify_organization_ownership(organization_id: str):
     # TODO: raise HTTPException(403) if actor shouldn't access org data
     pass
 
 
 @app.put(
-    "/organization/{organization_id}", dependencies=[Depends(verify_organization_id)]
+    "/organization/{organization_id}", dependencies=[Depends(verify_organization_ownership)]
 )
 def update_organization(organization_id: str, updated_organization: Organization):
     # TODO: prohibit changing name to existing one
@@ -103,13 +110,20 @@ def update_organization(organization_id: str, updated_organization: Organization
 
 @app.post(
     "/organization/{organization_id}/listing",
-    dependencies=[Depends(verify_organization_id)],
+    dependencies=[Depends(verify_organization_ownership)],
 )
 def create_listing(organization_id: str, listing: Listing):
     listing.organization_id = organization_id
     data = listing.to_airtable_fields()
     created_airtable_record = listings_table.create(data)
     return created_airtable_record
+
+
+@app.get("/organization/{organization_id}/listing/{listing_id}")
+def delete_listing(organization_id: str, listing_id: str):
+    # TODO restrict access?
+    airtable_record = listings_table.get(listing_id)
+    return airtable_record
 
 
 def verify_listing_ownership(organization_id: str, listing_id: str):
@@ -119,7 +133,7 @@ def verify_listing_ownership(organization_id: str, listing_id: str):
 
 @app.put(
     "/organization/{organization_id}/listing/{listing_id}",
-    dependencies=[Depends(verify_organization_id), Depends(verify_listing_ownership)],
+    dependencies=[Depends(verify_organization_ownership), Depends(verify_listing_ownership)],
 )
 def update_listing(organization_id: str, listing_id: str, updated_listing: Listing):
     updated_listing.listing_id = listing_id
@@ -132,7 +146,7 @@ def update_listing(organization_id: str, listing_id: str, updated_listing: Listi
 
 @app.delete(
     "/organization/{organization_id}/listing/{listing_id}",
-    dependencies=[Depends(verify_organization_id), Depends(verify_listing_ownership)],
+    dependencies=[Depends(verify_organization_ownership), Depends(verify_listing_ownership)],
 )
 def delete_listing(organization_id: str, listing_id: str):
     deletion_report = listings_table.delete(listing_id)
