@@ -6,8 +6,7 @@ router = fastapi.APIRouter()
 
 from models import Target, Listing, ListingType
 from airtable import listings_table, labels_table
-from dependecies import get_web_user_access_level, AccessLevel
-import airtable
+
 
 class LabelsContainer:
     def __init__(self) -> None:
@@ -16,9 +15,10 @@ class LabelsContainer:
         self.refresh()
         
     def refresh(self):
+        # TODO: refresh sometimes
         self.labels = {'_root': {'id': '_root'}}
         self.graph  = dict()
-        for record in airtable.base.get_table('labels2').all():
+        for record in labels_table.all():
             label = {
                 'id': record['id'],
                 'level': record['fields']['level'],
@@ -59,25 +59,20 @@ labels_container = LabelsContainer()
 def get_labels():
     return labels_container.get_labels_subtree()
     
-def _get_listings(user_accces_level = fastapi.Depends(get_web_user_access_level)) -> typing.List[Listing]:
-    if user_accces_level <= AccessLevel.PUBLIC:
-        records = listings_table.all(formula="_listingPublicVisibility")
-    elif user_accces_level <= AccessLevel.MEMBER_OF_VERIFIED_ORG:
-        records = listings_table.all(formula="_listingForVerifiedUsersVisibility")
-    elif user_accces_level <= AccessLevel.ADMIN:
-        records = listings_table.all()
-    else:
-        raise PermissionError
-    return [Listing.from_airtable_record(record) for record in records]
+def get_all_listings_visible_for_user() -> typing.List[Listing]:
+    # TODO: access control
+    records = listings_table.all()
+    listings = [Listing.from_airtable_record(record) for record in records]
+    return listings
 
 
 @router.get('/listings', response_model=typing.List[Listing])
 def get_listings(
-    text_query: str = None,  # TODO
-    type: ListingType = None,
-    targets: typing.List[Target] = fastapi.Query([]),
-    labels_ids: typing.List[str] = fastapi.Query([]),
-    listings = fastapi.Depends(_get_listings)
+    text_query: str = fastapi.Query(None, description='Not yet implemented'),  # TODO
+    type: ListingType = fastapi.Query(None, description='(optional) only include needs or offers'),
+    targets: typing.List[Target] = fastapi.Query([], description='(optional) consider only listings targeted at at least one of the provided "targets"'),
+    labels_ids: typing.List[str] = fastapi.Query([], description='(optional) consider only listings with provided labels (or its sublabels) corresponding to provided labels ids, number of matched labels determines output order'),
+    listings = fastapi.Depends(get_all_listings_visible_for_user)
 ):
     if type:
         listings = [listing for listing in listings if listing.type == type]
@@ -86,22 +81,22 @@ def get_listings(
         listings = [listing for listing in listings if any(listing_target in targets for listing_target in listing.targets)]
     
     if labels_ids:
-        matching_labels = [        
+        labels_to_match_against = [        
             sublabel_id
             for selected_label_id in labels_ids
             for sublabel_id in labels_container.get_all_sublabels_ids(selected_label_id)
         ]
         
-        def how_many_labels_match(listing, matching_labels):
+        def how_many_labels_match(listing, labels_to_match_against):
             n = 0
             for label in listing.labels_ids:
-                if label in matching_labels:
+                if label in labels_to_match_against:
                     n += 1
             return n
 
         items = [
             {
-                'n': how_many_labels_match(listing, matching_labels),
+                'n': how_many_labels_match(listing, labels_to_match_against),
                 'listing': listing
             }
             for listing in listings

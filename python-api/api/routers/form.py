@@ -1,19 +1,25 @@
-from fastapi import FastAPI, HTTPException, Depends
-import fastapi
-
+from fastapi import FastAPI, HTTPException, Depends, APIRouter
 from models import Organization, Listing
 from airtable import organizations_table, listings_table
-from dependecies import verify_organization_ownership, verify_listing_ownership
 
 
-router = fastapi.APIRouter()
+router = APIRouter()
 
 
-# org utils
+# utils
 
 
 def organization_with_this_name_exists(organization_name: str):
     return len(organizations_table.all(formula=f'Name="{organization_name}"')) > 0
+
+def verify_organization_ownership(organization_id: str):
+    # TODO: raise HTTPException(403) if actor doesn't own org
+    pass
+
+def verify_listing_ownership(organization_id: str, listing_id: str):
+    # TODO: raise HTTPException(403) accordingly
+    pass
+
 
 
 # org crud

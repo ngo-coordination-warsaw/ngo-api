@@ -9,5 +9,5 @@ from routers.web import router as web_router
 
 app = fastapi.FastAPI()
 
-app.include_router(form_router)
-app.include_router(web_router)
+app.include_router(form_router, tags=['org & listings crud'])
+app.include_router(web_router, tags=['for frontend'])
