@@ -57,6 +57,15 @@ def update_organization(organization_id: str, updated_organization: Organization
     return updated_airtable_record
 
 
+@router.delete(
+    "/organization/{organization_id}",
+    dependencies=[Depends(verify_organization_ownership)],
+)
+def delete_organization(organization_id: str):
+    deletion_report = organizations_table.delete(organization_id)
+    return deletion_report
+
+
 # listings crud
 
 

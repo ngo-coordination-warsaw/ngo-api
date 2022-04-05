@@ -2,25 +2,40 @@ import pydantic
 import typing
 import enum
 
-ContactDetails = str
+
+def snake_case_to_spaced_capitalized(s):
+    return ' '.join(word.capitalize() for word in s.split('_'))
+
+def spaced_capitalized_to_snake_case(s):
+    return '_'.join(word.lower() for word in s.split(' '))
+
 
 class Organization(pydantic.BaseModel):
+    
     organization_id: typing.Optional[str]
+    
     name: str
     description: str
-    contact_details: ContactDetails
-    visible_publicly: bool
-    visible_for_others: bool
-    gdpr_consent: bool
+    
+    contact_person: str
+    contact_phone: str
+    contact_email: str
+    additional_contact_info: str
+    
+    org_public_visibility: bool = False
+    org_for_other_orgs_visibility: bool = False
+    gdpr_consent: bool = False
 
     def to_airtable_fields(self):
-        return {
-            "Name": self.name,
-            "Description": self.description,
-            "orgPublicVisibility": self.visible_publicly,
-            "orgForOtherOrgsVisibility": self.visible_for_others,
-            "GDPR": self.gdpr_consent,
-        }
+        return {snake_case_to_spaced_capitalized(k): v for k, v in self.dict().items() if k != 'organization_id'}
+
+    @classmethod
+    def from_airtable_record(cls, record):
+        self = Organization.parse_obj({spaced_capitalized_to_snake_case(k): v for k, v in record['fields'].items()})
+        self.organization_id = record['id']
+        return self
+
+
 
 class Target(str, enum.Enum):
     cwk = "CWK"
