@@ -62,7 +62,7 @@ labels_container = LabelsContainer()
 def get_labels():
     return labels_container.get_labels_subtree()
 
-api_key_scheme = fastapi.security.APIKeyHeader(name='API_KEY', auto_error=False)
+api_key_scheme = fastapi.security.APIKeyQuery(name='API_KEY', auto_error=False)
 
 def can_user_view_every_listing(api_key = fastapi.Depends(api_key_scheme)):
     if 'MASTER_READ_API_KEY' in os.environ and api_key == os.environ['MASTER_READ_API_KEY']:
