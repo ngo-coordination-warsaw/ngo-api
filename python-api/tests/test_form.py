@@ -8,7 +8,7 @@ from requests.exceptions import HTTPError
 def test_form_crud():
     organization = Organization(
         name=f"test org {int(100*random.random())}",
-        description="description",
+        descriptionEN="description",
         contactPerson="contact_person",
         contactPhone="contact_phone",
         contactEmail="contact_email",
@@ -27,14 +27,14 @@ def test_form_crud():
 
     # org update
     updated_description = "updated_description"
-    organization.description = updated_description
+    organization.descriptionEN = updated_description
     updated_airtable_record = update_organization(organizationId, organization)
     updated_organization = Organization.from_airtable_record(updated_airtable_record)
     assert organization == updated_organization
 
     listing = Listing(
         organizationId=organizationId,
-        needOrOfferDescription="description",
+        needOrOfferDescriptionEN="description",
         type="Need",
         fromOrForWhom=["CWK"],
         labelsIds=[],
@@ -52,7 +52,7 @@ def test_form_crud():
 
     # listing update
     updated_description = "updated_description"
-    listing.needOrOfferDescription = updated_description
+    listing.needOrOfferDescriptionEN = updated_description
     updated_airtable_record = update_listing(organizationId, listingId, listing)
     updated_listing = Listing.from_airtable_record(updated_airtable_record)
     assert listing == updated_listing

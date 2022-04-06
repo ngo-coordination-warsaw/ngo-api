@@ -15,7 +15,9 @@ class Organization(pydantic.BaseModel):
     organizationId: typing.Optional[str]
     
     name: str
-    description: str
+    descriptionPL: typing.Optional[str]
+    descriptionEN: typing.Optional[str]
+    descriptionUA: typing.Optional[str]
     
     contactPerson: str
     contactPhone: str
@@ -51,7 +53,9 @@ ListingType = typing.Literal["Need", "Offer"]
 class Listing(pydantic.BaseModel):
     listingId: typing.Optional[str]
     organizationId: str
-    needOrOfferDescription: str
+    needOrOfferDescriptionPL: typing.Optional[str]
+    needOrOfferDescriptionEN: typing.Optional[str]
+    needOrOfferDescriptionUA: typing.Optional[str]
 
     listingContactPerson: typing.Optional[str]
     listingContactPhone: typing.Optional[str]
