@@ -52,9 +52,15 @@ class Listing(pydantic.BaseModel):
     listingId: typing.Optional[str]
     organizationId: str
     needOrOfferDescription: str
+
+    listingContactPerson: typing.Optional[str]
+    listingContactPhone: typing.Optional[str]
+    listingContactEmail: typing.Optional[str]
+    listingAdditionalContactInfo: typing.Optional[str]
+
     type: ListingType
-    fromOrForWhom: typing.List[Target]
-    labelsIds: typing.List[str]
+    fromOrForWhom: typing.List[Target] = []
+    labelsIds: typing.List[str] = []
 
     def to_airtable_fields(self):        
         data = self.dict()
@@ -74,12 +80,4 @@ class Listing(pydantic.BaseModel):
         del data['labels']
         self = cls.parse_obj(data)
         self.listingId = record['id']
-        # (
-        #     listing_id      = record['id'],
-        #     organization_id = record['fields']['OrganizationName'][0],
-        #     description     = record['fields'].get('Need/offer description', ''),
-        #     type            = record['fields']['Type'],
-        #     targets         = [Target(target) for target in record['fields'].get('From/for whom', [])],
-        #     labels_ids      = record['fields'].get('Labels', [])
-        # )
         return self

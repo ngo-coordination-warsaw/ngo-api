@@ -61,7 +61,7 @@ def get_labels():
     
 def get_all_listings_visible_for_user() -> typing.List[Listing]:
     # TODO: access control
-    records = listings_table.all()
+    records = listings_table.all(formula="_listingPublicVisibility")
     listings = [Listing.from_airtable_record(record) for record in records]
     return listings
 
