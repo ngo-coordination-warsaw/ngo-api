@@ -78,7 +78,7 @@ def get_listings(
         listings = [listing for listing in listings if listing.type == type]
     
     if targets:
-        listings = [listing for listing in listings if any(listing_target in targets for listing_target in listing.targets)]
+        listings = [listing for listing in listings if any(listing_target in targets for listing_target in listing.fromOrForWhom)]
     
     if labels_ids:
         labels_to_match_against = [        
@@ -89,7 +89,7 @@ def get_listings(
         
         def how_many_labels_match(listing, labels_to_match_against):
             n = 0
-            for label in listing.labels_ids:
+            for label in listing.labelsIds:
                 if label in labels_to_match_against:
                     n += 1
             return n
