@@ -1,11 +1,14 @@
 import fastapi
+import fastapi.security
 import typing
+import os
 
 
 router = fastapi.APIRouter()
 
 from models import Target, Listing, ListingType
 from airtable import listings_table, labels_table
+
 
 
 class LabelsContainer:
@@ -58,10 +61,19 @@ labels_container = LabelsContainer()
 @router.get('/labels_tree')
 def get_labels():
     return labels_container.get_labels_subtree()
+
+api_key_scheme = fastapi.security.APIKeyHeader(name='API_KEY', auto_error=False)
+
+def can_user_view_every_listing(api_key = fastapi.Depends(api_key_scheme)):
+    if 'MASTER_READ_API_KEY' in os.environ and api_key == os.environ['MASTER_READ_API_KEY']:
+        return True
+    return False
     
-def get_all_listings_visible_for_user() -> typing.List[Listing]:
-    # TODO: access control
-    records = listings_table.all(formula="_listingPublicVisibility")
+def get_all_listings_visible_for_user(can_user_view_every_listing = fastapi.Depends(can_user_view_every_listing)) -> typing.List[Listing]:
+    if can_user_view_every_listing:
+        records = listings_table.all()
+    else:    
+        records = listings_table.all(formula="_listingPublicVisibility")
     listings = [Listing.from_airtable_record(record) for record in records]
     return listings
 
