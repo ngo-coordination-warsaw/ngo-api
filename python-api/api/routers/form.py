@@ -74,7 +74,7 @@ def delete_organization(organization_id: str):
     dependencies=[Depends(verify_organization_ownership)],
 )
 def create_listing(organization_id: str, listing: Listing):
-    listing.organization_id = organization_id
+    listing.organizationId = organization_id
     data = listing.to_airtable_fields()
     created_airtable_record = listings_table.create(data)
     return created_airtable_record
@@ -87,7 +87,7 @@ def create_listing(organization_id: str, listing: Listing):
         Depends(verify_listing_ownership),
     ],
 )
-def delete_listing(organization_id: str, listing_id: str):
+def read_listing(organization_id: str, listing_id: str):
     airtable_record = listings_table.get(listing_id)
     return airtable_record
 
@@ -100,8 +100,8 @@ def delete_listing(organization_id: str, listing_id: str):
     ],
 )
 def update_listing(organization_id: str, listing_id: str, updated_listing: Listing):
-    updated_listing.listing_id = listing_id
-    updated_listing.organization_id = organization_id
+    updated_listing.listingId = listing_id
+    updated_listing.organizationId = organization_id
     updated_airtable_record = listings_table.update(
         listing_id, updated_listing.to_airtable_fields()
     )
