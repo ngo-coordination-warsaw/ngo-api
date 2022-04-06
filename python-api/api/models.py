@@ -36,7 +36,6 @@ class Organization(pydantic.BaseModel):
         return self
 
 
-
 class Target(str, enum.Enum):
     cwk = "CWK"
     ngo = "NGOs"
@@ -44,19 +43,19 @@ class Target(str, enum.Enum):
     ref = "Refugees"
     ukr = "Entities on Ukraine"
 
-LabelId = str
 
 ListingType = typing.Literal["Need", "Offer"]
 
 class Listing(pydantic.BaseModel):
     listing_id: typing.Optional[str]
     organization_id: str
-    description: str
+    need_or_offer_description: str
     type: ListingType
-    targets: typing.List[Target]
+    from_or_for_whom: typing.List[Target]
     labels_ids: typing.List[str]
 
     def to_airtable_fields(self):
+        return {snake_case_to_spaced_capitalized(k): v for k, v in self.dict().items() if k != 'listing_id'}
         return {
             "OrganizationName": [self.organization_id],
             "Need/offer description": self.description,
