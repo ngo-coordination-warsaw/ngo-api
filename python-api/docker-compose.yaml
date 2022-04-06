@@ -1,0 +1,12 @@
+version: '3.1'
+services:
+  api:
+    container_name: api
+    image: cwk-api:local
+    build: .
+    ports:
+      - 8000:8000
+    env_file:
+      - prod.env
+    volumes:
+      - .:/app:ro

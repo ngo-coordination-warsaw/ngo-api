@@ -6,6 +6,6 @@ COPY requirements.txt requirements.txt
 
 RUN python3 -m pip install -r requirements.txt
 
-COPY api .
+COPY . .
 
-CMD uvicorn main:app --host 0.0.0.0
+CMD uvicorn main:app --host 0.0.0.0 --reload
