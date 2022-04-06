@@ -3,7 +3,11 @@ from models import Organization, Listing
 from airtable import organizations_table, listings_table
 
 
-router = APIRouter()
+def authorize_user():
+    raise HTTPException(423)
+
+
+router = APIRouter(dependencies=[Depends(authorize_user)])
 
 
 # utils
@@ -14,13 +18,11 @@ def organization_with_this_name_exists(organization_name: str):
 
 
 def verify_organization_ownership(organization_id: str):
-    # TODO: raise HTTPException(403) if actor doesn't own org
-    pass
+    pass  #  raise HTTPException(403)
 
 
 def verify_listing_ownership(organization_id: str, listing_id: str):
-    # TODO: raise HTTPException(403) accordingly
-    pass
+    pass  #  raise HTTPException(403)
 
 
 # org crud
