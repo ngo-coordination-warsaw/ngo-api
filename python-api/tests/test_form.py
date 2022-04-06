@@ -1,5 +1,5 @@
-from api.models import Organization, Listing
-from api.routers.form import *
+from models import Organization, Listing
+from routers.form import *
 import random
 import pytest
 from requests.exceptions import HTTPError
