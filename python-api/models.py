@@ -14,20 +14,41 @@ class Organization(pydantic.BaseModel):
     
     organizationId: typing.Optional[str]
     
-    name: str
+    name: pydantic.constr(min_length=3)
     descriptionPL: typing.Optional[str]
     descriptionEN: typing.Optional[str]
     descriptionUA: typing.Optional[str]
     
-    contactPerson: str
-    contactPhone: str
-    contactEmail: str
-    additionalContactInfo: str
+    contactPerson: typing.Optional[str]
+    contactPhone: typing.Optional[str]
+    contactEmail: typing.Optional[str]
+    additionalContactInfo: typing.Optional[str]
     
     orgPublicVisibility: bool = False
     orgForOtherOrgsVisibility: bool = False
     gdprConsent: bool = False
 
+    @pydantic.root_validator
+    def some_description_provided(cls, values):
+        if not any([
+            values.get('descriptionPL'),
+            values.get('descriptionEN'),
+            values.get('descriptionUA')
+        ]):
+            raise ValueError('Please provide some description')
+        return values
+
+    @pydantic.root_validator
+    def some_contact_details_provided(cls, values):
+        if not any([
+            values.get('contactPerson'),
+            values.get('contactEmail'),
+            values.get('contactPhone')
+        ]):
+            raise ValueError('Please provide some contact details')
+        return values
+
+    
     def to_airtable_fields(self):
         data = self.dict()
         del data['organizationId'] 

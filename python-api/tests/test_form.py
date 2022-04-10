@@ -16,20 +16,18 @@ def test_form_crud():
     )
 
     # org create
-    created_airtable_record = create_organization(organization)
-    organizationId = created_airtable_record["id"]
+    created_organization = create_organization(organization)
+    organizationId = created_organization.organizationId
     organization.organizationId = organizationId
 
     # org read
-    airtable_record = read_organization(organizationId)
-    _read_organization = Organization.from_airtable_record(airtable_record)
+    _read_organization = read_organization(organizationId)
     assert organization == _read_organization
 
     # org update
     updated_description = "updated_description"
     organization.descriptionEN = updated_description
-    updated_airtable_record = update_organization(organizationId, organization)
-    updated_organization = Organization.from_airtable_record(updated_airtable_record)
+    updated_organization = update_organization(organizationId, organization)
     assert organization == updated_organization
 
     listing = Listing(
@@ -41,20 +39,18 @@ def test_form_crud():
     )
 
     # listing create
-    created_airtable_record = create_listing(organizationId, listing)
-    listingId = created_airtable_record["id"]
+    created_listing = create_listing(organizationId, listing)
+    listingId = created_listing.listingId
     listing.listingId = listingId
 
     # listeing read
-    airtable_record = read_listing(organizationId, listingId)
-    _read_listing = Listing.from_airtable_record(airtable_record)
-    assert listing.dict() == _read_listing.dict()
+    _read_listing = read_listing(organizationId, listingId)
+    assert listing == _read_listing
 
     # listing update
     updated_description = "updated_description"
     listing.needOrOfferDescriptionEN = updated_description
-    updated_airtable_record = update_listing(organizationId, listingId, listing)
-    updated_listing = Listing.from_airtable_record(updated_airtable_record)
+    updated_listing = update_listing(organizationId, listingId, listing)
     assert listing == updated_listing
 
     # listing delete
