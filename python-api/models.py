@@ -62,7 +62,7 @@ class Listing(pydantic.BaseModel):
     listingContactEmail: typing.Optional[str]
     listingAdditionalContactInfo: typing.Optional[str]
 
-    type: ListingType
+    type: typing.Optional[ListingType]
     fromOrForWhom: typing.List[Target] = []
     labelsIds: typing.List[str] = []
 
