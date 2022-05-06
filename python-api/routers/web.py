@@ -7,7 +7,7 @@ import os
 router = fastapi.APIRouter()
 
 from models import Target, Listing, ListingType
-from airtable import listings_table, labels_table
+from airtable import listings_table, labels_table, image_assets_table, text_assets_table
 
 
 
@@ -124,3 +124,33 @@ def get_listings(
         listings = [item['listing'] for item in items]
 
     return listings
+
+
+@router.get('/assets/texts/all')
+def get_all_text_assets():
+    return [x['fields'] for x in text_assets_table.all()]
+
+
+@router.get('/assets/texts/{id}')
+def get_all_text_assets(id):
+    asset = text_assets_table.all(formula=f'id="{id}"')
+    if not asset:
+        raise fastapi.HTTPException(404)
+    if not len(asset) == 1:
+        raise fastapi.HTTPException(500, detail='multiple assets found')
+    return asset[0]['fields']
+
+
+@router.get('/assets/images/all')
+def get_all_text_assets():
+    return [x['fields'] for x in image_assets_table.all()]
+
+
+@router.get('/assets/images/{id}')
+def get_all_text_assets(id):
+    asset = image_assets_table.all(formula=f'id="{id}"')
+    if not asset:
+        raise fastapi.HTTPException(404)    
+    if not len(asset) == 1:
+        raise fastapi.HTTPException(500, detail='multiple assets found')
+    return asset[0]['fields']
