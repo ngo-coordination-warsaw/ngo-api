@@ -29,6 +29,10 @@ class LabelsContainer:
                 'namePL': record['fields'].get('namePL'),
                 'nameEN': record['fields'].get('nameEN'),
                 'nameUA': record['fields'].get('nameUA'),
+                'descriptionPL': record['fields'].get('descriptionPL'),
+                'descriptionEN': record['fields'].get('descriptionEN'),
+                'descriptionUA': record['fields'].get('descriptionUA'),
+                'image': record['fields'].get('image', [])[0]
             }
             label_id = record['id']
             parent_id = record['fields']['parent'][0] if 'parent' in record['fields'] else '_root'
