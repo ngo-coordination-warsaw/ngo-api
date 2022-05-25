@@ -132,7 +132,7 @@ def get_all_text_assets():
 
 
 @router.get('/assets/texts/{id}')
-def get_all_text_assets(id):
+def get_text_asset(id):
     asset = text_assets_table.all(formula=f'id="{id}"')
     if not asset:
         raise fastapi.HTTPException(404)
@@ -142,12 +142,12 @@ def get_all_text_assets(id):
 
 
 @router.get('/assets/images/all')
-def get_all_text_assets():
+def get_all_image_assets():
     return [x['fields'] for x in image_assets_table.all()]
 
 
 @router.get('/assets/images/{id}')
-def get_all_text_assets(id):
+def get_image_asset(id):
     asset = image_assets_table.all(formula=f'id="{id}"')
     if not asset:
         raise fastapi.HTTPException(404)    
