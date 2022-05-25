@@ -1,4 +1,4 @@
-from fastapi import HTTPException, Depends, APIRouter
+from fastapi import HTTPException, Depends, APIRouter, Body
 from fastapi.security import HTTPBearer
 from models import Organization, Listing
 from airtable import organizations_table, listings_table, users_table
@@ -62,6 +62,10 @@ def verify_listing_ownership(organization_id: str, listing_id: str, user_data: U
     if listing_id not in user_data.listingsIds:
         raise HTTPException(status_code=403, detail=f"This org does not own this listing!")
 
+def is_user_trusted():
+    # TODO
+    return True
+
 
 @router.post("/organization", response_model=Organization)
 def create_organization(organization: Organization, user_data: UserData = Depends(authorize_and_get_user_data)):
@@ -81,7 +85,7 @@ def create_organization(organization: Organization, user_data: UserData = Depend
     
     return Organization.from_airtable_record(created_airtable_organization_record)
 
-@router.post("/organization/{organization_id}/add_user", dependencies=[Depends(verify_organization_ownership)])
+@router.post("/organization/{organization_id}/user", dependencies=[Depends(verify_organization_ownership)])
 def assign_org_to_user(organization_id: str, firebase_uid: str):
     user_records = users_table.all(formula=f'firebaseUid="{firebase_uid}"')
     if len(user_records) >= 2:
@@ -186,3 +190,26 @@ def update_listing(organization_id: str, listing_id: str, updated_listing: Listi
 def delete_listing(organization_id: str, listing_id: str):
     deletion_report = listings_table.delete(listing_id)
     return deletion_report
+
+
+@router.get(
+    "/organization/{organization_id}/listing/{listing_id}/comments",
+    response_model=typing.List[str]
+)
+def get_comments(organization_id: str, listing_id: str):
+    separator = ';&;'
+    joined_comments = listings_table.get(listing_id)['fields'].get('comments')
+    if not joined_comments:
+        return []
+    comments = joined_comments.split(separator)
+    return comments
+
+@router.post(
+    "/organization/{organization_id}/listing/{listing_id}/comment",
+    dependencies=[Depends(is_user_trusted)],
+)
+def add_comment(organization_id: str, listing_id: str, new_comment: str = Body(default='', min_length=1)):
+    separator = ';&;'
+    comments = get_comments('does not matter', listing_id)
+    comments = separator.join([*comments, new_comment])
+    listings_table.update(record_id=listing_id, fields={'comments': comments}, replace=False)
