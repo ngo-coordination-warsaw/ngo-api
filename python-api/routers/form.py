@@ -63,7 +63,7 @@ def verify_listing_ownership(organization_id: str, listing_id: str, user_data: U
         raise HTTPException(status_code=403, detail=f"This org does not own this listing!")
 
 
-@router.post("/organization")
+@router.post("/organization", response_model=Organization)
 def create_organization(organization: Organization, user_data: UserData = Depends(authorize_and_get_user_data)):
     # 1. create org entry
     # 2. create user entry and assign org
@@ -148,7 +148,8 @@ def create_listing(organization_id: str, listing: Listing):
 
 @router.get(
     "/organization/{organization_id}/listing/{listing_id}",
-    dependencies=[Depends(verify_listing_ownership)]
+    dependencies=[Depends(verify_listing_ownership)],
+    response_model=Listing
 )
 def read_listing(organization_id: str, listing_id: str):
     airtable_record = listings_table.get(listing_id)
@@ -156,7 +157,8 @@ def read_listing(organization_id: str, listing_id: str):
 
 @router.get(
     "/organization/{organization_id}/all_listings",
-    # TODO: access control dependencies=[Depends(verify_listing_ownership)]
+    # TODO: access control dependencies=[Depends(verify_listing_ownership)],
+    response_model=typing.List[Listing]
 )
 def read_all_listings(organization_id: str):
     airtable_record = listings_table.all(formula=f'organizationId="{organization_id}"')
@@ -165,7 +167,8 @@ def read_all_listings(organization_id: str):
 
 @router.put(
     "/organization/{organization_id}/listing/{listing_id}",
-    dependencies=[Depends(verify_listing_ownership)]
+    dependencies=[Depends(verify_listing_ownership)],
+    response_model=Listing
 )
 def update_listing(organization_id: str, listing_id: str, updated_listing: Listing):
     updated_listing.listingId = listing_id
