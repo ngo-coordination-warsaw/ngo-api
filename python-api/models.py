@@ -52,7 +52,7 @@ ListingType = typing.Literal["Need", "Offer"]
 
 class Listing(pydantic.BaseModel):
     listingId: typing.Optional[str]
-    organizationId: str
+    organizationId: typing.Optional[str]
     needOrOfferDescriptionPL: typing.Optional[str]
     needOrOfferDescriptionEN: typing.Optional[str]
     needOrOfferDescriptionUA: typing.Optional[str]
@@ -78,7 +78,7 @@ class Listing(pydantic.BaseModel):
     @classmethod
     def from_airtable_record(cls, record):
         data = record['fields']
-        data['organizationId'] = data['organization'][0]
+        data['organizationId'] = data.setdefault('organization', [None])[0]
         data['labelsIds'] = data.setdefault('labels', [])
         del data['organization']
         del data['labels']
