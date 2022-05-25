@@ -79,7 +79,7 @@ def create_organization(organization: Organization, user_data: UserData = Depend
     
     assign_org_to_user(organization_id, user_data.firebase_user_uid)
     
-    return created_airtable_organization_record
+    return Organization.from_airtable_record(created_airtable_organization_record)
 
 @router.post("/organization/{organization_id}/add_user", dependencies=[Depends(verify_organization_ownership)])
 def assign_org_to_user(organization_id: str, firebase_uid: str):
@@ -102,22 +102,24 @@ def assign_org_to_user(organization_id: str, firebase_uid: str):
 @router.get(
     "/organization/{organization_id}",
     dependencies=[Depends(verify_organization_ownership)],
+    response_model = Organization
 )
 def read_organization(organization_id: str):
     airtable_record = organizations_table.get(organization_id)
-    return airtable_record
+    return Organization.from_airtable_record(airtable_record)
 
 
 @router.put(
     "/organization/{organization_id}",
     dependencies=[Depends(verify_organization_ownership)],
+    response_model = Organization
 )
 def update_organization(organization_id: str, updated_organization: Organization):
     # TODO: prohibit changing name to existing one
     updated_airtable_record = organizations_table.update(
         organization_id, updated_organization.to_airtable_fields()
     )
-    return updated_airtable_record
+    return Organization.from_airtable_record(updated_airtable_record)
 
 
 @router.delete(
@@ -135,12 +137,13 @@ def delete_organization(organization_id: str):
 @router.post(
     "/organization/{organization_id}/listing",
     dependencies=[Depends(verify_organization_ownership)],
+    response_model=Listing
 )
 def create_listing(organization_id: str, listing: Listing):
     listing.organizationId = organization_id
     data = listing.to_airtable_fields()
     created_airtable_record = listings_table.create(data)
-    return created_airtable_record
+    return Listing.from_airtable_record(created_airtable_record)
 
 
 @router.get(
@@ -149,7 +152,7 @@ def create_listing(organization_id: str, listing: Listing):
 )
 def read_listing(organization_id: str, listing_id: str):
     airtable_record = listings_table.get(listing_id)
-    return airtable_record
+    return Listing.from_airtable_record(airtable_record)
 
 @router.get(
     "/organization/{organization_id}/all_listings",
@@ -170,7 +173,7 @@ def update_listing(organization_id: str, listing_id: str, updated_listing: Listi
     updated_airtable_record = listings_table.update(
         listing_id, updated_listing.to_airtable_fields()
     )
-    return updated_airtable_record
+    return Listing.from_airtable_record(updated_airtable_record)
 
 
 @router.delete(
