@@ -8,12 +8,7 @@ import typing
 import os
 
 
-def lock():
-    raise HTTPException(423)
-
-
-router = APIRouter(dependencies=[Depends(lock)])
-
+router = APIRouter()
 
 # auth
 
@@ -154,6 +149,14 @@ def create_listing(organization_id: str, listing: Listing):
 )
 def read_listing(organization_id: str, listing_id: str):
     airtable_record = listings_table.get(listing_id)
+    return airtable_record
+
+@router.get(
+    "/organization/{organization_id}/all_listings",
+    # TODO: access control dependencies=[Depends(verify_listing_ownership)]
+)
+def read_all_listings(organization_id: str):
+    airtable_record = listings_table.all(formula=f'organizationId="{organization_id}"')
     return airtable_record
 
 
