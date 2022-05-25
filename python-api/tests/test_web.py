@@ -18,3 +18,6 @@ def test_get_listings():
     test(targets=[Target.cwk])
     test(targets=[Target.cwk, Target.ngo])
     test(labels_ids=['labelId'])
+
+def test_get_labels_tree():
+    client.get('/labels_tree').raise_for_status()
