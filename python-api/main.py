@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = fastapi.FastAPI()
 
-app.include_router(form_router, tags=["org & listings crud"])
+app.include_router(form_router, tags=["org & listings management"])
 app.include_router(web_router, tags=["Frontend"])
 
 app.add_middleware(

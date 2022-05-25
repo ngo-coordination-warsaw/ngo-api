@@ -3,3 +3,4 @@ pydantic
 uvicorn[standard]
 pyairtable
 pytest
+firebase-admin

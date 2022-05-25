@@ -16,7 +16,7 @@ def test_form_crud():
     )
 
     # org create
-    created_airtable_record = create_organization(organization)
+    created_airtable_record = create_organization(organization, UserData(firebase_user_uid='test_user'))
     organizationId = created_airtable_record["id"]
     organization.organizationId = organizationId
 
