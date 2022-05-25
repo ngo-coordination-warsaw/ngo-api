@@ -11,3 +11,5 @@ base = pyairtable.Base(
 organizations_table = base.get_table("Organizations")
 listings_table = base.get_table("Listings")
 labels_table = base.get_table("Labels")
+text_assets_table = base.get_table("texts")
+image_assets_table = base.get_table("images")
