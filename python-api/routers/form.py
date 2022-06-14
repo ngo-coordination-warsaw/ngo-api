@@ -67,6 +67,12 @@ def is_user_trusted():
     return True
 
 
+@router.get("/my_organization_id", response_model=str)
+def get_my_organization_id(user_data: UserData = Depends(authorize_and_get_user_data)):
+    if not user_data.organizationId:
+        raise HTTPException(status_code=404, detail=f"This user is not assigned to any org!")
+    return user_data.organizationId
+
 @router.post("/organization", response_model=Organization)
 def create_organization(organization: Organization, user_data: UserData = Depends(authorize_and_get_user_data)):
     # 1. create org entry
