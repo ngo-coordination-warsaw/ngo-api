@@ -33,7 +33,7 @@ def authorize_and_get_user_data(jwt: str = Depends(scheme)) -> UserData:
     elif len(user_records) == 1:
         user_record = user_records[0]
         user_data.airtable_user_record_id = user_record['id']
-        user_data.organizationId = user_record.get('organization', [None])[0]
+        user_data.organizationId = user_record['fields'].get('organization', [None])[0]
 
     if user_data.organizationId:
         organization_record = organizations_table.get(user_data.organizationId)
