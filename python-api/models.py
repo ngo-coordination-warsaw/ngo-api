@@ -27,6 +27,7 @@ class Organization(pydantic.BaseModel):
     orgPublicVisibility: bool = False
     orgForOtherOrgsVisibility: bool = False
     gdprConsent: bool = False
+    orgVerified: bool = False
 
     @pydantic.validator('name')
     def name_non_empty(value):

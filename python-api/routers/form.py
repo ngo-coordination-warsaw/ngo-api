@@ -82,6 +82,7 @@ def create_organization(organization: Organization, user_data: UserData = Depend
         raise HTTPException(status_code=404, detail=f"User already owns org {user_data.organizationId}")
     if organization_with_this_name_exists(organization.name):
         raise HTTPException(status_code=404, detail="Organization name is taken")
+    organization.orgVerified = False
     created_airtable_organization_record = organizations_table.create(
         organization.to_airtable_fields()
     )
@@ -126,8 +127,10 @@ def read_organization(organization_id: str):
 )
 def update_organization(organization_id: str, updated_organization: Organization):
     # TODO: prohibit changing name to existing one
+    new_data = updated_organization.to_airtable_fields()
+    del new_data['orgVerified']
     updated_airtable_record = organizations_table.update(
-        organization_id, updated_organization.to_airtable_fields()
+        organization_id, new_data
     )
     return Organization.from_airtable_record(updated_airtable_record)
 
