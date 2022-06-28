@@ -93,6 +93,7 @@ class Listing(pydantic.BaseModel):
     type: typing.Optional[ListingType]
     fromOrForWhom: typing.List[Target] = []
     labelsIds: typing.List[str] = []
+    listingVerified: bool = False
 
     def to_airtable_fields(self):        
         data = self.dict()

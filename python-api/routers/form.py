@@ -154,6 +154,7 @@ def delete_organization(organization_id: str):
 )
 def create_listing(organization_id: str, listing: Listing):
     listing.organizationId = organization_id
+    listing.listingVerified = False
     data = listing.to_airtable_fields()
     created_airtable_record = listings_table.create(data)
     return Listing.from_airtable_record(created_airtable_record)
@@ -186,8 +187,10 @@ def read_all_listings(organization_id: str):
 def update_listing(organization_id: str, listing_id: str, updated_listing: Listing):
     updated_listing.listingId = listing_id
     updated_listing.organizationId = organization_id
+    new_data = updated_listing.to_airtable_fields()
+    del new_data['listingVerified']
     updated_airtable_record = listings_table.update(
-        listing_id, updated_listing.to_airtable_fields()
+        listing_id, new_data
     )
     return Listing.from_airtable_record(updated_airtable_record)
 
