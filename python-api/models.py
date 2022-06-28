@@ -81,6 +81,7 @@ ListingType = typing.Literal["Need", "Offer"]
 class Listing(pydantic.BaseModel):
     listingId: typing.Optional[str]
     organizationId: typing.Optional[str]
+    organizationName: typing.Optional[str]
     needOrOfferDescriptionPL: typing.Optional[str]
     needOrOfferDescriptionEN: typing.Optional[str]
     needOrOfferDescriptionUA: typing.Optional[str]
@@ -99,6 +100,7 @@ class Listing(pydantic.BaseModel):
         data = self.dict()
         del data['listingId']
         del data['organizationId']
+        del data['organizationName']
         data['organization'] = [self.organizationId]
         del data['labelsIds']
         data['labels'] = self.labelsIds
@@ -111,6 +113,8 @@ class Listing(pydantic.BaseModel):
         data['labelsIds'] = data.setdefault('labels', [])
         del data['organization']
         del data['labels']
+        if data.setdefault('organizationName', ''):
+            del data['organizationName']
         self = cls.parse_obj(data)
         self.listingId = record['id']
         return self
