@@ -171,8 +171,8 @@ def read_listing(organization_id: str, listing_id: str):
     response_model=typing.List[Listing]
 )
 def read_all_listings(organization_id: str):
-    airtable_record = listings_table.all(formula=f'organizationId="{organization_id}"')
-    return airtable_record
+    airtable_records = listings_table.all(formula=f'organizationId="{organization_id}"')
+    return [Listing.from_airtable_record(record) for record in airtable_records]
 
 
 @router.put(
