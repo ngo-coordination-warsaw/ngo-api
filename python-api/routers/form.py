@@ -62,9 +62,6 @@ def verify_listing_ownership(organization_id: str, listing_id: str, user_data: U
     if listing_id not in user_data.listingsIds:
         raise HTTPException(status_code=403, detail=f"This org does not own this listing!")
 
-def is_user_trusted():
-    # TODO
-    return True
 
 
 @router.get("/my_organization_id", response_model=str)
@@ -206,7 +203,8 @@ def delete_listing(organization_id: str, listing_id: str):
 
 @router.get(
     "/organization/{organization_id}/listing/{listing_id}/comments",
-    response_model=typing.List[str]
+    response_model=typing.List[str],
+    dependencies=[Depends(authorize_and_get_user_data)]
 )
 def get_comments(organization_id: str, listing_id: str):
     separator = ';&;'
@@ -218,9 +216,8 @@ def get_comments(organization_id: str, listing_id: str):
 
 @router.post(
     "/organization/{organization_id}/listing/{listing_id}/comment",
-    dependencies=[Depends(is_user_trusted)],
 )
-def add_comment(organization_id: str, listing_id: str, new_comment: str = Body(default='', min_length=1)):
+def add_comment(organization_id: str, listing_id: str, new_comment: str = Body(default='', min_length=1), user_data=Depends(authorize_and_get_user_data)):
     separator = ';&;'
     comments = get_comments('does not matter', listing_id)
     comments = separator.join([*comments, new_comment])
