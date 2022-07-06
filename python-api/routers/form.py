@@ -131,8 +131,8 @@ def read_organization(organization_id: str):
 )
 def update_organization(organization_id: str, updated_organization: Organization):
     # TODO: prohibit changing name to existing one
+    updated_organization.orgVerified = False
     new_data = updated_organization.to_airtable_fields()
-    del new_data['orgVerified']
     updated_airtable_record = organizations_table.update(
         organization_id, new_data
     )
@@ -191,8 +191,8 @@ def read_all_listings(organization_id: str):
 def update_listing(organization_id: str, listing_id: str, updated_listing: Listing):
     updated_listing.listingId = listing_id
     updated_listing.organizationId = organization_id
+    updated_listing.listingVerified = False
     new_data = updated_listing.to_airtable_fields()
-    del new_data['listingVerified']
     updated_airtable_record = listings_table.update(
         listing_id, new_data
     )
