@@ -67,7 +67,8 @@ def verify_listing_ownership(organization_id: str, listing_id: str, user_data: U
 @router.get("/my_organization_id", response_model=str)
 def get_my_organization_id(user_data: UserData = Depends(authorize_and_get_user_data)):
     if not user_data.organizationId:
-        raise HTTPException(status_code=404, detail=f"This user is not assigned to any org!")
+        #raise HTTPException(status_code=404, detail=f"This user is not assigned to any org!")
+        return None
     return user_data.organizationId
 
 @router.post("/organization", response_model=Organization)
