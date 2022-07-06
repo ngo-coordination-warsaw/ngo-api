@@ -2,7 +2,7 @@ from fastapi import HTTPException, Depends, APIRouter, Body
 from fastapi.security import HTTPBearer
 from models import Organization, Listing
 from airtable import organizations_table, listings_table, users_table
-from firebase import decode_jwt
+from firebase import decode_jwt, create_or_get_user_by_email_and_return_firebase_uid
 import pydantic
 import typing
 import os
@@ -85,12 +85,18 @@ def create_organization(organization: Organization, user_data: UserData = Depend
     )
     organization_id = created_airtable_organization_record['id']
     
-    assign_org_to_user(organization_id, user_data.firebase_user_uid)
+    assign_org_to_user_by_firebaseuid(organization_id, user_data.firebase_user_uid)
     
     return Organization.from_airtable_record(created_airtable_organization_record)
 
 @router.post("/organization/{organization_id}/user", dependencies=[Depends(verify_organization_ownership)])
-def assign_org_to_user(organization_id: str, firebase_uid: str):
+def assign_org_to_user_by_email(organization_id: str, email: pydantic.EmailStr = Body(default='mail@mail.com')):
+    
+    firebase_uid = create_or_get_user_by_email_and_return_firebase_uid(email)
+    assign_org_to_user_by_firebaseuid(organization_id, firebase_uid)
+  
+
+def assign_org_to_user_by_firebaseuid(organization_id: str, firebase_uid):    
     user_records = users_table.all(formula=f'firebaseUid="{firebase_uid}"')
     if len(user_records) >= 2:
         raise HTTPException(status_code=500, detail=f"Multiple DB entries for one user!")
